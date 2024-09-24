@@ -1,9 +1,8 @@
 // Clase
-
 class ToDo {
-  Texto
-  Prioridade
-  Feito = false
+  Texto;
+  Prioridade;
+  Feito = false;
 
   constructor(texto, prioridade) {
     this.Texto = texto;
@@ -12,56 +11,73 @@ class ToDo {
 }
 
 // Array
-array = []
+array = [];
 
 //funções projeto
-
 function CriarToDo(texto, prioridade, array) {  
-  let objetoTodo = new ToDo(texto, prioridade)
-  if (!array.some(x => x.Texto == texto)) //.some verifica se ao menos um elemento do array satisfaz uma determinada condição(true ou false)
+  let objetoTodo = new ToDo(texto, prioridade);
+  if (!array.some(x => x.Texto == texto)) { 
     array.push(objetoTodo);
+  }
   return objetoTodo;
 }
 
 function AtualizarToDo(textoAntigo, textoNovo, array) {
-  let atualizado = false
-  array.forEach(todo =>{
-    if(todo.Texto == textoAntigo) {
-      todo.Texto == textoNovo
-      atualizado = true
+  let atualizado = false;
+  array.forEach(todo => {
+    if (todo.Texto === textoAntigo) {
+      todo.Texto = textoNovo;
+      atualizado = true;
     }
-  })
-  return atualizado
+  });
+  return atualizado;
 }
 
 function ConcluirToDo(array, texto) {
-  let concluido = false
+  let concluido = false;
   array.forEach(todo => {
-    if (array.Texto == texto) {
-      if (todo.Feito)
-        todo.Feito = false
-      else {
-        todo.Feito = true
-      }
-      concluido = true
+    if (todo.Texto == texto) {
+      todo.Feito = !todo.Feito; // Alterna o status
+      concluido = true;
     }
-  })
-  return concluido
+  });
+  return concluido;
 }
 
-function ExcluirToDo() {
+function ExcluirToDo(array, texto) {
+  let index;
+  let removido = false; 
 
+  array.forEach(todo => {
+    if (todo.Texto === texto) {
+      index = array.indexOf(todo);
+      removido = true; 
+    }
+  });
+  if (removido) {
+    array.splice(index, 1);
+  }
+  return removido; 
 }
 
-function PesquisarToDo() {
- 
+function PesquisarToDo(array, texto) {
+  let pesquisa = false;
+  array.forEach(todo => {
+    if(todo.Texto.includes(texto)) {
+      pesquisa = true;
+    }
+  });
+  return pesquisa;
 }
 
-function OrdenarCrescente() {
-  
+function OrdenarCrescente(array) {
+  array.sort((a, b) => a.Prioridade - b.Prioridade);
+  return array;
 }
-function OrdenarDecrescente() {
-  
+
+function OrdenarDecrescente(array) {
+  array.sort((a, b) => b.Prioridade - a.Prioridade);
+  return array;
 }
 
 // Seleção de elementos
@@ -78,11 +94,9 @@ const filterBtn = document.querySelector("#filter-select");
 
 let oldInputValue;
 
-
-
 // Funções
 const saveTodo = (text, rating, done = 0, save = 1) => {
-  let objetoTodo = CriarToDo(text, rating, arrayTodos)
+  let objetoTodo = CriarToDo(text, rating, array);
 
   const todo = document.createElement("div");
   todo.classList.add("todo");
@@ -123,8 +137,6 @@ const saveTodo = (text, rating, done = 0, save = 1) => {
 
   todoInput.value = "";
   todoInput2.value = "";
-
-
 };
 
 const toggleForms = () => {
@@ -135,16 +147,15 @@ const toggleForms = () => {
 
 const updateTodo = (text) => {
   const todos = document.querySelectorAll(".todo");
-  let targetTodo
+  let targetTodo;
   todos.forEach((todo) => {
     let todoTitle = todo.querySelector("h3");
     if (todoTitle.innerText === oldInputValue) {
-      targetTodo = todoTitle
+      targetTodo = todoTitle;
     }
-
   });
 
-  let atualizado = AtualizarToDo(targetTodo.innerText, text,arrayTodos)
+  let atualizado = AtualizarToDo(targetTodo.innerText, text, array);
 
   if (atualizado) {
     targetTodo.innerText = text;
@@ -156,7 +167,7 @@ const updateTodo = (text) => {
 const getSearchedTodos = (search) => {
   const todos = document.querySelectorAll(".todo");
 
-  let pesquisa = PesquisarToDo(arrayTodos, search)
+  let pesquisa = PesquisarToDo(array, search);
 
   if (pesquisa) {
     todos.forEach((todo) => {
@@ -164,14 +175,12 @@ const getSearchedTodos = (search) => {
 
       todo.style.display = "flex";
 
-      if (!todoTitle.includes(search)) {
+      if (!todoTitle.includes(search.toLowerCase())) {
         todo.style.display = "none";
       }
     });
-  };
-}
-
-
+  }
+};
 
 const filterTodos = (filterValue) => {
   const todos = document.querySelectorAll(".todo");
@@ -179,20 +188,20 @@ const filterTodos = (filterValue) => {
   switch (filterValue) {
     case "cresc":
       todos.forEach((todo) => {
-        todo.remove()
-        removeTodoLocalStorage(todo.querySelector("h3").innerText)
-      })
-      arrayTodos = OrdenarCrescente(arrayTodos)
-      arrayTodos.forEach((todo) => saveTodo(todo.Texto, todo.Prioridade, done = 0, save = 1))
+        todo.remove();
+        removeTodoLocalStorage(todo.querySelector("h3").innerText);
+      });
+      array = OrdenarCrescente(array);
+      array.forEach((todo) => saveTodo(todo.Texto, todo.Prioridade, done = 0, save = 1));
       break;
 
     case "decresc":
       todos.forEach((todo) => {
-        todo.remove()
-        removeTodoLocalStorage(todo.querySelector("h3").innerText)
-      })
-      arrayTodos = OrdenarDecrescente(arrayTodos)
-      arrayTodos.forEach((todo) => saveTodo(todo.Texto, todo.Prioridade, done = 0, save = 1))
+        todo.remove();
+        removeTodoLocalStorage(todo.querySelector("h3").innerText);
+      });
+      array = OrdenarDecrescente(array);
+      array.forEach((todo) => saveTodo(todo.Texto, todo.Prioridade, done = 0, save = 1));
       break;
 
     default:
@@ -222,8 +231,8 @@ document.addEventListener("click", (e) => {
   }
 
   if (targetEl.classList.contains("finish-todo")) {
-    todoTitle = parentEl.querySelector("h3").innerText
-    let concluido = ConcluirToDo(arrayTodos, todoTitle)
+    todoTitle = parentEl.querySelector("h3").innerText;
+    let concluido = ConcluirToDo(array, todoTitle);
     if (concluido) {
       parentEl.classList.toggle("done");
       updateTodoStatusLocalStorage(todoTitle);
@@ -231,20 +240,18 @@ document.addEventListener("click", (e) => {
   }
 
   if (targetEl.classList.contains("remove-todo")) {
-    todoTitle = parentEl.querySelector("h3").innerText
-    let removido = ExcluirToDo(arrayTodos, todoTitle)
+    todoTitle = parentEl.querySelector("h3").innerText;
+    let removido = ExcluirToDo(array, todoTitle);
     if (removido) {
       parentEl.remove();
 
       // Utilizando dados da localStorage
       removeTodoLocalStorage(todoTitle);
     }
-
   }
 
   if (targetEl.classList.contains("edit-todo")) {
     toggleForms();
-
     editInput.value = todoTitle;
     oldInputValue = todoTitle;
   }
@@ -269,34 +276,28 @@ editForm.addEventListener("submit", (e) => {
 
 searchInput.addEventListener("keyup", (e) => {
   const search = e.target.value;
-
   getSearchedTodos(search);
 });
 
 eraseBtn.addEventListener("click", (e) => {
   e.preventDefault();
-
   searchInput.value = "";
-
   searchInput.dispatchEvent(new Event("keyup"));
 });
 
 filterBtn.addEventListener("change", (e) => {
   const filterValue = e.target.value;
-
   filterTodos(filterValue);
 });
 
 // Local Storage
 const getTodosLocalStorage = () => {
   const todos = JSON.parse(localStorage.getItem("todos")) || [];
-
   return todos;
 };
 
 const loadTodos = () => {
   const todos = getTodosLocalStorage();
-
   todos.forEach((todo) => {
     saveTodo(todo.text, todo.rating, todo.done, 0);
   });
@@ -304,37 +305,29 @@ const loadTodos = () => {
 
 const saveTodoLocalStorage = (todo) => {
   const todos = getTodosLocalStorage();
-
   todos.push(todo);
-
   localStorage.setItem("todos", JSON.stringify(todos));
 };
 
 const removeTodoLocalStorage = (todoText) => {
   const todos = getTodosLocalStorage();
-
   const filteredTodos = todos.filter((todo) => todo.text != todoText);
-
   localStorage.setItem("todos", JSON.stringify(filteredTodos));
 };
 
 const updateTodoStatusLocalStorage = (todoText) => {
   const todos = getTodosLocalStorage();
-
   todos.map((todo) =>
     todo.text === todoText ? (todo.done = !todo.done) : null
   );
-
   localStorage.setItem("todos", JSON.stringify(todos));
 };
 
 const updateTodoLocalStorage = (todoOldText, todoNewText) => {
   const todos = getTodosLocalStorage();
-
   todos.map((todo) =>
     todo.text === todoOldText ? (todo.text = todoNewText) : null
   );
-
   localStorage.setItem("todos", JSON.stringify(todos));
 };
 
